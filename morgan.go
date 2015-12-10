@@ -1,7 +1,11 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
+	"os"
+	"runtime/pprof"
 )
 
 type member struct {
@@ -15,6 +19,9 @@ func (m *member) end(i int) bool {
 }
 
 func (m *member) next(i int) byte {
+	if m.i+i >= m.l {
+		return m.v[m.l-1]
+	}
 	return m.v[m.i+i]
 }
 
@@ -75,11 +82,8 @@ func pick_first(prev byte, x *member, y *member) (int, int) {
 	_ = "breakpoint"
 	k := 1
 	for {
-		if x.end(k) {
-			return k, 0
-		}
-		if y.end(k) {
-			return 0, k
+		if x.end(k) && y.end(k) {
+			return k, k
 		}
 		if x.next(k) == y.next(k) {
 			// XBCAA
@@ -115,7 +119,19 @@ func pick_first(prev byte, x *member, y *member) (int, int) {
 	}
 }
 
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
+
 func main() {
+	flag.Parse()
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	n := 0
 	fmt.Scan(&n)
 	arr := make([]pair, n)
