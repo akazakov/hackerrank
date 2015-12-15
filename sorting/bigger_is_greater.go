@@ -15,6 +15,11 @@ func ReadInt(scanner *bufio.Scanner) int {
 	return x
 }
 
+func ReadWord(scanner *bufio.Scanner) string {
+	scanner.Scan()
+	return scanner.Text()
+}
+
 func ReadArr(scanner *bufio.Scanner, n int) []int {
 	result := make([]int, n)
 	for i := 0; i < n; i++ {
@@ -32,38 +37,42 @@ func PrintArr(w *bufio.Writer, arr []int) {
 	}
 }
 
-func quicksort(w *bufio.Writer, arr []int) []int {
-	if len(arr) < 2 {
-		return arr
+func FindBigger(s string) bool {
+	l := len(s)
+	for i := l - 1; i >= 1; i-- {
+		if s[i-1] < s[i] {
+			PrintStr(s, i, i-1)
+			return true
+		}
 	}
+	return false
+}
 
-	N := len(arr)
-	left := make([]int, 0, N)
-	right := make([]int, 0, N)
-	p := arr[0]
-	for _, v := range arr {
-		if v < p {
-			left = append(left, v)
-		}
-		if v > p {
-			right = append(right, v)
+func PrintStr(s string, j, k int) {
+	jj := s[j]
+	kk := s[k]
+	for i := 0; i < len(s); i++ {
+		if i == j {
+			fmt.Fprintf(w, "%c", kk)
+		} else if i == k {
+			fmt.Fprintf(w, "%c", jj)
+		} else {
+			fmt.Fprintf(w, "%c", s[i])
 		}
 	}
-	left = quicksort(w, left)
-	right = quicksort(w, right)
-	left = append(left, p)
-	left = append(left, right...)
-	PrintArr(w, left)
 	fmt.Fprintln(w, "")
-	return left
 }
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Split(bufio.ScanWords)
 	w = bufio.NewWriter(os.Stdout)
-	N := ReadInt(scanner)
-	arr := ReadArr(scanner, N)
-	quicksort(w, arr)
+	T := ReadInt(scanner)
+	for i := 0; i < T; i++ {
+		s := ReadWord(scanner)
+		if !FindBigger(s) {
+			fmt.Fprintln(w, "no answer")
+		}
+	}
 	w.Flush()
 }
