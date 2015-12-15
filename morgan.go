@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"log"
 	"os"
 	"runtime/pprof"
 )
+
+var w *bufio.Writer
 
 type member struct {
 	l int
@@ -20,21 +23,21 @@ func (m *member) end(i int) bool {
 
 func (m *member) next(i int) byte {
 	if m.i+i >= m.l {
-		return m.v[m.l-1]
+		return 'z'
 	}
 	return m.v[m.i+i]
 }
 
 func (m *member) pr_all() {
 	for !m.end(0) {
-		fmt.Printf("%c", m.next(0))
+		fmt.Fprintf(w, "%c", m.next(0))
 		m.advance(1)
 	}
 }
 
 func (m *member) pr(i int) {
 	for i > 0 && !m.end(0) {
-		fmt.Printf("%c", m.next(0))
+		fmt.Fprintf(w, "%c", m.next(0))
 		m.advance(1)
 		i--
 	}
@@ -71,11 +74,11 @@ func pr(x *member, y *member) {
 			y.pr(y_k)
 			continue
 		}
-		fmt.Printf("%c", c)
+		fmt.Fprintf(w, "%c", c)
 	}
 	x.pr_all()
 	y.pr_all()
-	fmt.Println("")
+	fmt.Fprintln(w, "")
 }
 
 func pick_first(prev byte, x *member, y *member) (int, int) {
@@ -83,7 +86,7 @@ func pick_first(prev byte, x *member, y *member) (int, int) {
 	k := 1
 	for {
 		if x.end(k) && y.end(k) {
-			return k, k
+			return 1, 0
 		}
 		if x.next(k) == y.next(k) {
 			// XBCAA
@@ -141,8 +144,10 @@ func main() {
 		fmt.Scan(&arr[i].s[1].v)
 		arr[i].s[1].l = len(arr[i].s[1].v)
 	}
+	w = bufio.NewWriter(os.Stdout)
 
 	for i := 0; i < n; i++ {
 		pr(&arr[i].s[0], &arr[i].s[1])
 	}
+	w.Flush()
 }
