@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
+	"strings"
 )
 
 var w *bufio.Writer
@@ -41,7 +43,19 @@ func FindBigger(s string) bool {
 	l := len(s)
 	for i := l - 1; i >= 1; i-- {
 		if s[i-1] < s[i] {
-			PrintStr(s, i, i-1)
+			p := s[i-1]
+			k := i
+			for j := i + 1; j < l; j++ {
+				if s[j] > p && s[j] <= s[k] {
+					k = j
+				}
+			}
+			result := s[:i-1] + s[k:k+1]
+			ps := strings.Split(s[i:], "")
+			ps[k-i] = s[i-1 : i]
+			sort.Strings(ps)
+			result += strings.Join(ps, "")
+			fmt.Fprintln(w, result)
 			return true
 		}
 	}
