@@ -42,6 +42,11 @@ func main() {
 	for _, v := range arr {
 		counts[v]++
 	}
-	PrintArr(w, counts)
+	for k, v := range counts {
+		for i := v; i > 0; i-- {
+			fmt.Fprint(w, k)
+			fmt.Fprint(w, " ")
+		}
+	}
 	w.Flush()
 }
